@@ -1,0 +1,47 @@
+
+int lightsensor = A4; // This is where your photoresistor is plugged in. The other side goes to the "power" pin (refer to diagram).
+
+int positive = D4; // This is the other end of your light sensor
+
+int analogvalue; // Here we are declaring the integer variable analogvalue, which we will use later to store the value of the photoresistor.
+char lightReading[2];
+
+void setup() {
+
+    // First, declare all of our pins. This lets our device know which ones will be used for outputting voltage, and which ones will read incoming voltage
+    pinMode(lightsensor,INPUT);  // Our photoresistor pin is input (reading the photoresistor)
+    pinMode(positive,OUTPUT); // The pin powering the photoresistor is output (sending out consistent power)
+
+    // Next, write one pin of the photoresistor to be the maximum possible, so that we can use this for power.
+    digitalWrite(positive,HIGH);
+
+    // We are going to declare a Particle.variable() here so that we can access the value of the photoresistor from the cloud.
+    Particle.variable("analogvalue", &analogvalue, INT);
+    // This is saying that when we ask the cloud for "analogvalue", this will reference the variable analogvalue in this app, which is an integer variable.
+
+}
+
+void loop() {
+
+    // check to see what the value of the photoresistor is and store it in the int variable analogvalue
+    analogvalue = analogRead(lightsensor);
+    delay(1500);
+
+   sprintf(lightReading, "%d", analogvalue);
+	Particle.publish("sensorReading1", lightReading, PRIVATE);  
+		
+    if(analogvalue>12){
+        
+        Spark.publish("senorReading","its day",60,PRIVATE);  
+  
+        delay(5000); 
+    }
+    else if(analogvalue < 12)
+    {
+     Spark.publish("sensorReading","its night",60,PRIVATE);   
+    delay(5000); 
+    }
+    
+  
+}  
+  
